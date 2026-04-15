@@ -18,19 +18,26 @@ model User {
   songs         Song[]
   subscriptions Subscription[]
   payments      Payment[]
+  likes         Like[]
+  playlists     Playlist[]
+  comments      Comment[]
 }
 
 model Song {
-  id         String   @id @default(uuid())
-  title      String
-  artist     String
-  fileUrl    String
-  duration   Int
-  fileHash   String   @unique
-  uploadedBy String
-  createdAt  DateTime @default(now())
-
-  user User @relation(fields: [uploadedBy], references: [id])
+  id            String         @id @default(uuid())
+  title         String
+  artist        String
+  fileUrl       String
+  duration      Int
+  fileHash      String         @unique
+  uploadedBy    String
+  createdAt     DateTime       @default(now())
+  albumId       String?
+  album         Album?         @relation(fields: [albumId], references: [id])
+  user          User           @relation(fields: [uploadedBy], references: [id])
+  likes         Like[]
+  playlistSongs PlaylistSong[]
+  comments      Comment[]
 
   @@unique([title, artist, uploadedBy])
   @@index([uploadedBy])
@@ -60,4 +67,67 @@ model Payment {
   createdAt         DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model Album {
+  id        String   @id @default(uuid())
+  title     String
+  artist    String
+  coverUrl  String?
+  createdAt DateTime @default(now())
+
+  songs Song[]
+}
+
+model Like {
+  id     String @id @default(uuid())
+  userId String
+  songId String
+
+  user User @relation(fields: [userId], references: [id])
+  song Song @relation(fields: [songId], references: [id])
+
+  @@unique([userId, songId]) // prevent duplicate like
+}
+
+model Playlist {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  createdAt DateTime @default(now())
+
+  user  User           @relation(fields: [userId], references: [id])
+  songs PlaylistSong[]
+}
+
+model PlaylistSong {
+  id         String @id @default(uuid())
+  playlistId String
+  songId     String
+
+  playlist Playlist @relation(fields: [playlistId], references: [id])
+  song     Song     @relation(fields: [songId], references: [id])
+
+  @@unique([playlistId, songId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  userId    String
+  songId    String
+  parentId  String? // 🔥 for replies
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  song Song @relation(fields: [songId], references: [id])
+
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+}
+
+model SavedSong {
+  id     String @id @default(uuid())
+  userId String
+  songId String
 }
