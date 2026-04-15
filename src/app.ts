@@ -15,7 +15,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 //SANITIZATION
-app.use(xss());
+// app.use(xss());
 app.use(cors());
 app.use(
   helmet({

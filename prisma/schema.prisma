@@ -15,7 +15,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  songs Song[]
+  songs         Song[]
+  subscriptions Subscription[]
+  payments      Payment[]
 }
 
 model Song {
@@ -31,4 +33,31 @@ model Song {
   user User @relation(fields: [uploadedBy], references: [id])
 
   @@unique([title, artist, uploadedBy])
+  @@index([uploadedBy])
+  @@index([createdAt])
+}
+
+model Subscription {
+  id        String   @id @default(uuid())
+  userId    String
+  plan      String // monthly/yearly
+  status    String // active, cancelled, expired
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Payment {
+  id                String   @id @default(uuid())
+  userId            String
+  razorpayOrderId   String
+  razorpayPaymentId String?
+  amount            Int
+  currency          String
+  status            String // created, success, failed
+  createdAt         DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

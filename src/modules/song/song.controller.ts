@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createSong } from "./song.service";
+import { createSong, getSongById, searchSongs } from "./song.service";
 import { sendResponse } from "../../common/utils/response";
 import fs from "fs";
 import { prisma } from "../../config/db";
@@ -30,9 +30,10 @@ export const uploadSong = async (req: AuthRequest, res: Response) => {
 export const streamSong = async (req: Request, res: Response) => {
   const { id } = req.params as { id: string };
 
-  const song = await prisma.song.findUnique({
-    where: { id },
-  });
+  // const song = await prisma.song.findUnique({
+  //   where: { id },
+  // });
+  const song = await getSongById(id);
 
   if (!song) {
     throw new Error("Song not found");
@@ -47,8 +48,7 @@ export const streamSong = async (req: Request, res: Response) => {
   if (!range) {
     throw new Error("Range header required");
   }
-
-  const CHUNK_SIZE = 10 ** 6; // 1MB
+  const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB
   const start = Number(range.replace(/\D/g, ""));
   const end = Math.min(start + CHUNK_SIZE, fileSize - 1);
 
@@ -64,4 +64,11 @@ export const streamSong = async (req: Request, res: Response) => {
   });
 
   stream.pipe(res);
+};
+export const searchSongsController = async (req: Request, res: Response) => {
+  const { q } = req.query as { q: string };
+
+  const results = await searchSongs(q);
+
+  return sendResponse(res, results);
 };
