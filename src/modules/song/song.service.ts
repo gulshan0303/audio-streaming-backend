@@ -9,6 +9,7 @@ export const createSong = async (data: {
   artist: string;
   fileUrl: string;
   uploadedBy: string;
+  albumId: string;
 }) => {
   // 🔥 Generate file hash
   const fileHash = await generateFileHash(data.fileUrl);
@@ -30,14 +31,19 @@ export const createSong = async (data: {
       fileHash,
     },
   });
-  await esClient.index({
-    index: "songs",
-    id: song.id,
-    document: {
-      title: song.title,
-      artist: song.artist,
-    },
-  });
+  try {
+    await esClient.index({
+      index: "songs",
+      id: song.id,
+      document: {
+        title: song.title,
+        artist: song.artist,
+        albumId: song.albumId,
+      },
+    });
+  } catch (error) {
+    console.error("Elasticsearch indexing failed:", error.message);
+  }
 
   return song;
 };

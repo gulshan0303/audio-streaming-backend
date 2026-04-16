@@ -19,6 +19,21 @@ const fileFilter = (req: any, file: any, cb: any) => {
   cb(null, true);
 };
 
+const imageFilter = (req: any, file: any, cb: any) => {
+  if (!file.mimetype.startsWith("image/")) {
+    return cb(new AppError("Only image files allowed", 400), false);
+  }
+  cb(null, true);
+};
+
+export const imageUpload = multer({
+  storage,
+  fileFilter: imageFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
+});
+
 export const upload = multer({
   storage,
   fileFilter,

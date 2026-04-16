@@ -15,13 +15,14 @@ export const uploadSong = async (req: AuthRequest, res: Response) => {
     throw new Error("Unauthorized");
   }
 
-  const { title, artist } = req.body;
+  const { title, artist, albumId } = req.body;
 
   const song = await createSong({
     title,
     artist,
     fileUrl: file.path,
     uploadedBy: req.user.id,
+    albumId,
   });
 
   return sendResponse(res, song, "Song uploaded successfully");

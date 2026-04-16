@@ -7,11 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  user
+  admin
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
-  role      String   @default("user")
+  role      Role     @default(user)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -21,27 +26,26 @@ model User {
   likes         Like[]
   playlists     Playlist[]
   comments      Comment[]
+  albums        Album[]
 }
 
 model Song {
-  id            String         @id @default(uuid())
-  title         String
-  artist        String
-  fileUrl       String
-  duration      Int
-  fileHash      String         @unique
-  uploadedBy    String
-  createdAt     DateTime       @default(now())
-  albumId       String?
-  album         Album?         @relation(fields: [albumId], references: [id])
+  id         String   @id @default(uuid())
+  title      String
+  artist     String
+  fileUrl    String
+  duration   Int
+  fileHash   String   @unique
+  uploadedBy String
+  createdAt  DateTime @default(now())
+
+  albumId String?
+  album   Album?  @relation(fields: [albumId], references: [id])
+
   user          User           @relation(fields: [uploadedBy], references: [id])
   likes         Like[]
   playlistSongs PlaylistSong[]
   comments      Comment[]
-
-  @@unique([title, artist, uploadedBy])
-  @@index([uploadedBy])
-  @@index([createdAt])
 }
 
 model Subscription {
@@ -75,6 +79,9 @@ model Album {
   artist    String
   coverUrl  String?
   createdAt DateTime @default(now())
+
+  createdBy String
+  user      User   @relation(fields: [createdBy], references: [id])
 
   songs Song[]
 }

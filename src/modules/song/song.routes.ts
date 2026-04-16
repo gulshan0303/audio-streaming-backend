@@ -8,6 +8,7 @@ import {
 import { authenticate } from "../../common/middleware/auth.middleware";
 import { asyncHandler } from "../../common/utils/asyncHandler";
 import rateLimit from "express-rate-limit";
+import { authorize } from "../../common/middleware/rbac.middleware";
 
 const router = Router();
 
@@ -26,6 +27,7 @@ router.post(
   "/upload",
   uploadLimiter,
   authenticate,
+  // authorize("admin"),
   upload.single("audio"),
   asyncHandler(uploadSong),
 );
