@@ -28,6 +28,7 @@ model User {
   comments      Comment[]
   albums        Album[]
   shares        Share[]
+  playHistories PlayHistory[]
 }
 
 model Song {
@@ -48,6 +49,7 @@ model Song {
   playlistSongs PlaylistSong[]
   comments      Comment[]
   shares        Share[]
+  playHistories PlayHistory[]
 }
 
 model Subscription {
@@ -152,6 +154,19 @@ model Share {
 
   @@index([songId])
   @@index([userId])
+}
+
+model PlayHistory {
+  id       String   @id @default(uuid())
+  userId   String
+  songId   String
+  playedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  song Song @relation(fields: [songId], references: [id])
+
+  @@index([userId])
+  @@index([songId])
 }
 
 model SavedSong {

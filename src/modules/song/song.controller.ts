@@ -33,7 +33,7 @@ export const uploadSong = async (req: AuthRequest, res: Response) => {
   return sendResponse(res, song, "Song uploaded successfully");
 };
 
-export const streamSong = async (req: Request, res: Response) => {
+export const streamSong = async (req: AuthRequest, res: Response) => {
   const { id } = req.params as { id: string };
 
   // const song = await prisma.song.findUnique({
@@ -69,6 +69,22 @@ export const streamSong = async (req: Request, res: Response) => {
     "Content-Type": "audio/mpeg",
   });
 
+  try {
+    if (req.user?.id) {
+      try {
+        await prisma.playHistory.create({
+          data: {
+            userId: req.user.id, // now always string ✅
+            songId: id,
+          },
+        });
+      } catch (err) {
+        console.error("Play tracking failed");
+      }
+    }
+  } catch (err) {
+    console.error("Play tracking failed");
+  }
   stream.pipe(res);
 };
 export const searchSongsController = async (req: Request, res: Response) => {
