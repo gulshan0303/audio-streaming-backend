@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { upload } from "../../infrastructure/storage/local.storage";
 import {
+  getAllSongsController,
   searchSongsController,
   streamSong,
   uploadSong,
@@ -31,6 +32,7 @@ router.post(
   upload.single("audio"),
   asyncHandler(uploadSong),
 );
+router.get("/", getAllSongsController);
 router.get("/:id/stream", streamLimiter, asyncHandler(streamSong));
 router.get("/search", asyncHandler(searchSongsController));
 //router.get('/premium-stream', authenticate, requireSubscription, streamSong);

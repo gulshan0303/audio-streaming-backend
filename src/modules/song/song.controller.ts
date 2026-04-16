@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
-import { createSong, getSongById, searchSongs } from "./song.service";
+import {
+  createSong,
+  getAllSongs,
+  getSongById,
+  searchSongs,
+} from "./song.service";
 import { sendResponse } from "../../common/utils/response";
 import fs from "fs";
 import { prisma } from "../../config/db";
@@ -72,4 +77,10 @@ export const searchSongsController = async (req: Request, res: Response) => {
   const results = await searchSongs(q);
 
   return sendResponse(res, results);
+};
+
+export const getAllSongsController = async (req: Request, res: Response) => {
+  const data = await getAllSongs(req.query);
+
+  return sendResponse(res, data);
 };
