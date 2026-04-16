@@ -27,6 +27,7 @@ model User {
   playlists     Playlist[]
   comments      Comment[]
   albums        Album[]
+  shares        Share[]
 }
 
 model Song {
@@ -38,14 +39,15 @@ model Song {
   fileHash   String   @unique
   uploadedBy String
   createdAt  DateTime @default(now())
-
-  albumId String?
-  album   Album?  @relation(fields: [albumId], references: [id])
+  shareCount Int      @default(0)
+  albumId    String?
+  album      Album?   @relation(fields: [albumId], references: [id])
 
   user          User           @relation(fields: [uploadedBy], references: [id])
   likes         Like[]
   playlistSongs PlaylistSong[]
   comments      Comment[]
+  shares        Share[]
 }
 
 model Subscription {
@@ -133,6 +135,20 @@ model Comment {
 
   parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies Comment[] @relation("CommentReplies")
+
+  @@index([songId])
+  @@index([userId])
+}
+
+model Share {
+  id        String   @id @default(uuid())
+  userId    String
+  songId    String
+  platform  String? // whatsapp, instagram, etc
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  song Song @relation(fields: [songId], references: [id])
 
   @@index([songId])
   @@index([userId])

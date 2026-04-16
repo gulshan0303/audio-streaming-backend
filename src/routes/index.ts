@@ -5,7 +5,7 @@ import albumRoutes from "../modules/album/album.routes";
 import likeRoutes from "../modules/like/like.routes";
 import playListRoutes from "../modules/playlist/playlist.routes";
 import commentRoutes from "../modules/comment/comment.routes";
-
+import shareRoutes from "../modules/share/share.routes";
 const router = Router();
 
 router.use("/auth", authRoutes);
@@ -14,5 +14,6 @@ router.use("/albums", albumRoutes);
 router.use("/likes", likeRoutes);
 router.use("/playlists", playListRoutes);
 router.use("/comments", commentRoutes);
+router.use("/share", shareRoutes);
 
 export default router;
