@@ -133,6 +133,9 @@ model Comment {
 
   parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies Comment[] @relation("CommentReplies")
+
+  @@index([songId])
+  @@index([userId])
 }
 
 model SavedSong {
